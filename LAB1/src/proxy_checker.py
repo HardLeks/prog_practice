@@ -1,27 +1,38 @@
 import requests
 
 
-def get_proxy():
-    return 0
-
-
-def check_proxy():
-    url = 'http://www.google.com'
-    file = open('D:\\Works\\MAG\\PROG\\Python\\prog_practice\\LAB1\\src\\proxy.txt')
-
-    for proxy in file:
-        proxy = proxy[:len(proxy)-2]
-        print(proxy)
+def check_proxy(url, proxy):
+    with requests.Session() as s:
         try:
-            requests.get(url, proxies={'http': proxy}, timeout=5)
-            print('Success!')
+            s.get(url, proxies={'https': 'https://'+proxy}, timeout=5)
+            print('Success connection! prms=', url, proxy)
+            s.close()
+            return True
         except requests.exceptions.ProxyError:
-            print('End with error: ProxyError')
+            print('End with ProxyError prms=', url, proxy)
+
         except requests.exceptions.ConnectTimeout:
-            print('End with error: ConnectTimeout')
+            print('End with ConnectTimeout prms=', url, proxy)
 
-    return 0
+        except ValueError:
+            print('End with ValueError prms=', url, proxy)
+
+        s.close()
+        return False
 
 
-if __name__ == "__main__":
-    check_proxy()
+def check_proxy_from_file(url_list, file_path):
+    result_list = []
+    file = open(file_path)
+
+    for url in url_list:
+        for proxy in file:
+            proxy = proxy[:len(proxy) - 1]
+
+            print('Check ', proxy, ' for ', url)
+            result = check_proxy(url, proxy)
+            if result:
+                result_list.append(proxy)
+
+    file.close()
+    return result_list
