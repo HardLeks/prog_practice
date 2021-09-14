@@ -1,38 +1,42 @@
 import requests
 
 
-def check_proxy(url, proxy):
+def check_proxy(url, proxy, delay=3, debug=False):
     with requests.Session() as s:
         try:
-            s.get(url, proxies={'https': 'https://'+proxy}, timeout=5)
-            print('Success connection! prms=', url, proxy)
+            s.get(url, proxies={'http': 'http://'+proxy}, timeout=delay)
+            print('\tSuccess connection!')
             s.close()
             return True
-        except requests.exceptions.ProxyError:
-            print('End with ProxyError prms=', url, proxy)
-
-        except requests.exceptions.ConnectTimeout:
-            print('End with ConnectTimeout prms=', url, proxy)
-
+        except requests.RequestException as err:
+            if debug:
+                print('End with ', err)
         except ValueError:
-            print('End with ValueError prms=', url, proxy)
+            if debug:
+                print('End with ValueError')
 
+        print('\tFail connection!')
         s.close()
         return False
 
 
-def check_proxy_from_file(url_list, file_path):
-    result_list = []
-    file = open(file_path)
+def check_proxy_from_file(url_list, file_path, delay=3, debug=False):
+    result_list = set()
+    proxy_list = set()
 
+    file = open(file_path)
+    for line in file:
+        proxy_list.add(line[:len(line)-1])
+    file.close()
+
+    print('Check', len(proxy_list), 'proxy for', len(url_list), 'urls')
     for url in url_list:
-        for proxy in file:
+        for proxy in proxy_list:
             proxy = proxy[:len(proxy) - 1]
 
-            print('Check ', proxy, ' for ', url)
-            result = check_proxy(url, proxy)
+            print('Check', proxy, 'for', url)
+            result = check_proxy(url, proxy, delay, debug)
             if result:
-                result_list.append(proxy)
+                result_list.add(proxy)
 
-    file.close()
     return result_list
