@@ -19,7 +19,7 @@ class TestProxyChecker(unittest.TestCase):
 
         proxy_path = 'D:\\Works\\MAG\\PROG\\Python\\prog_practice\\LAB1\\tests\\proxy.txt'
 
-        self.res = check_proxy_from_file(site_list, proxy_path, 1)
+        self.res = check_proxy_from_file(site_list, proxy_path)
         self.assertEqual(len(self.res), len(self.res))
 
     def tearDown(self):

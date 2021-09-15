@@ -32,8 +32,6 @@ def check_proxy_from_file(url_list, file_path, delay=3, debug=False):
     print('Check', len(proxy_list), 'proxy for', len(url_list), 'urls')
     for url in url_list:
         for proxy in proxy_list:
-            proxy = proxy[:len(proxy) - 1]
-
             print('Check', proxy, 'for', url)
             result = check_proxy(url, proxy, delay, debug)
             if result:
